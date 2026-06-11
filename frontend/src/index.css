@@ -1,0 +1,1559 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================
+   NOURISHGRAPH - REFINED DESIGN SYSTEM
+   Harmonious Emerald/Teal Color Scheme
+   ========================================= */
+
+/* Dark Theme (Default) */
+:root,
+[data-theme="dark"] {
+    /* Primary - Emerald/Teal (Core Brand) */
+    --color-primary: #10B981;
+    --color-primary-light: #34D399;
+    --color-primary-dark: #059669;
+    --color-primary-50: rgba(16, 185, 129, 0.08);
+    --color-primary-100: rgba(16, 185, 129, 0.12);
+
+    /* Secondary - Emerald (same family) */
+    --color-secondary: #059669;
+    --color-secondary-light: #10B981;
+    --color-secondary-dark: #047857;
+
+    /* Accent */
+    --color-accent: #34D399;
+    --color-accent-light: #6EE7B7;
+
+    /* Neutral - Refined Dark */
+    --color-neutral-50: #FAFAFA;
+    --color-neutral-100: #F4F4F5;
+    --color-neutral-200: #E4E4E7;
+    --color-neutral-300: #D4D4D8;
+    --color-neutral-400: #A1A1AA;
+    --color-neutral-500: #71717A;
+    --color-neutral-600: #52525B;
+    --color-neutral-700: #3F3F46;
+    --color-neutral-800: #27272A;
+    --color-neutral-900: #18181B;
+    --color-neutral-950: #0A0A0B;
+
+    /* Background Colors */
+    --color-bg-primary: #0A0A0B;
+    --color-bg-secondary: #141416;
+    --color-bg-elevated: #1C1C1F;
+    --color-bg-card: #1C1C1F;
+    --color-bg-hover: #252529;
+
+    /* Text Colors */
+    --color-text-primary: #FAFAFA;
+    --color-text-secondary: #A1A1AA;
+    --color-text-muted: #71717A;
+    --color-text-subtle: #52525B;
+
+    /* Form Colors */
+    --color-input-bg: #1C1C1F;
+    --color-input-border: #2E2E32;
+    --color-input-text: #FAFAFA;
+
+    /* Border Colors */
+    --color-border: #2E2E32;
+    --color-bg-tertiary: #252529;
+
+    /* Semantic Colors */
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --color-info: #10B981;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    --gradient-hero: linear-gradient(135deg, #10B981 0%, #059669 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    color-scheme: dark;
+}
+
+/* Light Theme - Clean and Professional */
+[data-theme="light"] {
+    /* Primary - Emerald/Teal */
+    --color-primary: #059669;
+    --color-primary-light: #10B981;
+    --color-primary-dark: #047857;
+    --color-primary-50: rgba(5, 150, 105, 0.08);
+    --color-primary-100: rgba(5, 150, 105, 0.12);
+
+    /* Secondary */
+    --color-secondary: #047857;
+    --color-secondary-light: #059669;
+    --color-secondary-dark: #065F46;
+
+    /* Accent */
+    --color-accent: #10B981;
+    --color-accent-light: #34D399;
+
+    /* Background Colors - Subtle warmth */
+    --color-bg-primary: #F8FAFC;
+    --color-bg-secondary: #F1F5F9;
+    --color-bg-elevated: #FFFFFF;
+    --color-bg-card: #FFFFFF;
+    --color-bg-hover: #ECFDF5;
+    --color-bg-tertiary: #E2E8F0;
+
+    /* Text Colors - Better contrast */
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #334155;
+    --color-text-muted: #64748B;
+    --color-text-subtle: #94A3B8;
+
+    /* Form Colors */
+    --color-input-bg: #FFFFFF;
+    --color-input-border: #CBD5E1;
+    --color-input-text: #0F172A;
+
+    /* Border Colors */
+    --color-border: #E2E8F0;
+
+    /* Semantic */
+    --color-success: #059669;
+    --color-warning: #D97706;
+    --color-error: #DC2626;
+    --color-info: #059669;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    --gradient-hero: linear-gradient(135deg, #10B981 0%, #059669 100%);
+
+    /* Shadows - Softer */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    color-scheme: light;
+}
+
+/* Light theme overrides */
+[data-theme="light"] {
+    color: #0F172A;
+}
+
+/* Light theme - Fix dark backgrounds */
+[data-theme="light"] .bg-zinc-900,
+[data-theme="light"] .bg-zinc-900\/50,
+[data-theme="light"] .bg-zinc-800,
+[data-theme="light"] .bg-zinc-800\/50 {
+    background-color: #FFFFFF !important;
+    border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] .bg-base,
+[data-theme="light"] .bg-surface,
+[data-theme="light"] .bg-elevated,
+[data-theme="light"] .bg-card {
+    background-color: var(--color-bg-card) !important;
+}
+
+/* Light theme - Fix text colors */
+/* Keep white text on gradient backgrounds, but NOT for form elements */
+
+/* Keep white text and icons on SOLID brand-gradient backgrounds only.
+   Low-alpha tinted gradients (rgba / 8-digit hex stops) must keep their own
+   text colors — forcing white there makes labels unreadable in light theme
+   (e.g. the selected goal card in the profile form). */
+[data-theme="light"] :is(
+    [style*="135deg, #10B981 "],
+    [style*="135deg, #059669 "],
+    [style*="90deg, #059669 "],
+    [style*="135deg, #F59E0B "],
+    [style*="135deg, #EF4444 "],
+    [style*="135deg, #8B5CF6 "],
+    [style*="135deg, #3B82F6 "],
+    [style*="135deg, #F97316 "],
+    [style*="135deg, #EC4899 "],
+    [style*="135deg, #6B7280 "],
+    [style*="135deg, #DC2626 "],
+    [style*="135deg, #22C55E "],
+    [style*="135deg, #16A34A "]
+),
+[data-theme="light"] :is(
+    [style*="135deg, #10B981 "],
+    [style*="135deg, #059669 "],
+    [style*="90deg, #059669 "],
+    [style*="135deg, #F59E0B "],
+    [style*="135deg, #EF4444 "],
+    [style*="135deg, #8B5CF6 "],
+    [style*="135deg, #3B82F6 "],
+    [style*="135deg, #F97316 "],
+    [style*="135deg, #EC4899 "],
+    [style*="135deg, #6B7280 "],
+    [style*="135deg, #DC2626 "],
+    [style*="135deg, #22C55E "],
+    [style*="135deg, #16A34A "]
+) :is(span, div, svg) {
+    color: #FFFFFF !important;
+}
+
+/* IMPORTANT: Ensure form elements inside gradients have proper dark text */
+[data-theme="light"] [style*="linear-gradient"] input,
+[data-theme="light"] [style*="linear-gradient"] select,
+[data-theme="light"] [style*="linear-gradient"] textarea,
+[data-theme="light"] [style*="linear-gradient"] label {
+    color: #0F172A !important;
+}
+
+/* Input placeholders should be muted */
+[data-theme="light"] [style*="linear-gradient"] input::placeholder {
+    color: #94A3B8 !important;
+}
+
+[data-theme="light"] .text-zinc-100,
+[data-theme="light"] .text-zinc-200 {
+    color: #1E293B !important;
+}
+
+[data-theme="light"] .text-zinc-300,
+[data-theme="light"] .text-zinc-400 {
+    color: #334155 !important;
+}
+
+[data-theme="light"] .text-zinc-500,
+[data-theme="light"] .text-zinc-600 {
+    color: #64748B !important;
+}
+
+/* Light theme - Fix borders */
+[data-theme="light"] .border-zinc-700,
+[data-theme="light"] .border-zinc-800,
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/\[0\.06\],
+[data-theme="light"] .border-white\/\[0\.08\] {
+    border-color: #E4E4E7 !important;
+}
+
+/* Light theme - Fix inputs and selects */
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+    background-color: #FFFFFF !important;
+    color: #18181B !important;
+    border-color: #E4E4E7 !important;
+}
+
+[data-theme="light"] select option {
+    background-color: #FFFFFF !important;
+    color: #18181B !important;
+}
+
+/* Light theme - Fix cards with inline styles */
+[data-theme="light"] [style*="background: rgba(9, 9, 11"],
+[data-theme="light"] [style*="background: rgba(12, 12, 15"],
+[data-theme="light"] [style*="background: rgba(20, 20, 24"],
+[data-theme="light"] [style*="background: rgba(26, 26, 31"],
+[data-theme="light"] [style*="background: #09090b"],
+[data-theme="light"] [style*="background: #141418"],
+[data-theme="light"] [style*="background: #1a1a1f"] {
+    background: #FFFFFF !important;
+    border-color: #E4E4E7 !important;
+}
+
+/* Light theme - Fix gradients on dark backgrounds */
+[data-theme="light"] .from-zinc-900,
+[data-theme="light"] .from-zinc-800,
+[data-theme="light"] .via-zinc-900,
+[data-theme="light"] .to-zinc-800,
+[data-theme="light"] .to-zinc-900 {
+    --tw-gradient-from: #F4F4F5 !important;
+    --tw-gradient-to: #FAFAFA !important;
+    --tw-gradient-via: #FFFFFF !important;
+}
+
+/* Light theme - Fix hover states */
+[data-theme="light"] .hover\:bg-zinc-800:hover,
+[data-theme="light"] .hover\:bg-zinc-700:hover,
+[data-theme="light"] .hover\:bg-white\/5:hover,
+[data-theme="light"] .hover\:bg-white\/\[0\.06\]:hover {
+    background-color: #E4E4E7 !important;
+}
+
+/* Light theme - Fix dropdown menus */
+[data-theme="light"] .bg-surface\/95 {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Light theme - Meal Plans & Calendar */
+[data-theme="light"] [class*="bg-gradient-to-br"][class*="from-zinc"] {
+    background: linear-gradient(to bottom right, #FFFFFF, #F4F4F5) !important;
+}
+
+/* Light theme - Cards with shadows */
+[data-theme="light"] [class*="shadow-"] {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Light theme - Recipe cards */
+[data-theme="light"] .rounded-2xl,
+[data-theme="light"] .rounded-xl {
+    border-color: #E4E4E7;
+}
+
+/* Light theme - Fix all dark inline backgrounds */
+[data-theme="light"] [style*="rgba(255, 255, 255, 0.0"],
+[data-theme="light"] [style*="rgba(255, 255, 255, 0.1"] {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Light theme - Navigation pills */
+[data-theme="light"] .bg-zinc-900\/60 {
+    background-color: rgba(244, 244, 245, 0.9) !important;
+}
+
+/* Light theme - Profile and form sections */
+[data-theme="light"] .bg-gradient-to-br.from-zinc-900 {
+    background: #FFFFFF !important;
+}
+
+/* ================================================
+   LIGHT THEME - INLINE STYLE OVERRIDES
+   These override rgba() backgrounds used in JSX
+   ================================================ */
+
+/* Profile page - Back button and cards */
+[data-theme="light"] [style*="background: rgba(26, 26, 31"],
+[data-theme="light"] [style*="background: linear-gradient(145deg, rgba(26, 26, 31"],
+[data-theme="light"] [style*="background: linear-gradient(135deg, rgba(26, 26, 31"] {
+    background: #FFFFFF !important;
+    border-color: #E4E4E7 !important;
+}
+
+/* Form inputs with dark backgrounds */
+[data-theme="light"] [style*="background: rgba(20, 20, 24"],
+[data-theme="light"] [style*="background: rgba(12, 12, 15"] {
+    background: #F4F4F5 !important;
+    border-color: #E4E4E7 !important;
+    color: #18181B !important;
+}
+
+/* Fix gradient text in light mode */
+[data-theme="light"] [style*="WebkitBackgroundClip: 'text'"],
+[data-theme="light"] [style*="-webkit-background-clip: text"] {
+    background: linear-gradient(90deg, #18181B 0%, #52525B 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+/* Light theme - Override text-white ONLY when NOT inside gradient backgrounds */
+/* This selector specifically targets text-white that is NOT a child of gradient elements */
+[data-theme="light"] .text-white:not([style*="linear-gradient"] .text-white):not([style*="linear-gradient"]) {
+    color: #18181B !important;
+}
+
+/* CRITICAL: Force white color on ALL elements with inline gradient styles */
+/* These rules have higher specificity to override the above */
+[data-theme="light"] [style*="linear-gradient(135deg, #10B981"],
+[data-theme="light"] [style*="linear-gradient(135deg, rgb(16, 185, 129)"],
+[data-theme="light"] [style*="linear-gradient(135deg, #059669"],
+[data-theme="light"] button[style*="linear-gradient"],
+[data-theme="light"] span[style*="linear-gradient"],
+[data-theme="light"] div[style*="linear-gradient"]:not(:has(input)):not(:has(select)) {
+    color: #FFFFFF !important;
+}
+
+/* Also force white on .text-white class when parent has gradient */
+[data-theme="light"] [style*="linear-gradient"] .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Light theme - Muted text colors */
+[data-theme="light"] [style*="color: '#71717A'"],
+[data-theme="light"] [style*="color: '#A1A1AA'"],
+[data-theme="light"] [style*="color: #71717A"],
+[data-theme="light"] [style*="color: #A1A1AA"] {
+    color: #52525B !important;
+}
+
+/* Light theme - MealPlans calendar and stats */
+[data-theme="light"] [style*="background: 'rgba(9, 9, 11"],
+[data-theme="light"] [style*="background: rgba(9, 9, 11"] {
+    background: #FFFFFF !important;
+}
+
+/* Light theme - Recipe and meal cards hover */
+[data-theme="light"] [style*="border: '1px solid rgba(255, 255, 255"],
+[data-theme="light"] [style*="border: 1px solid rgba(255, 255, 255"] {
+    border-color: #E4E4E7 !important;
+}
+
+/* ================================================
+   THEME-AWARE UTILITY CLASSES
+   Use these in components for automatic theming
+   ================================================ */
+
+.theme-bg-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-input-border);
+}
+
+.theme-bg-elevated {
+    background-color: var(--color-bg-elevated);
+}
+
+.theme-bg-input {
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    color: var(--color-input-text);
+}
+
+.theme-text-primary {
+    color: var(--color-text-primary);
+}
+
+.theme-text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.theme-text-muted {
+    color: var(--color-text-muted);
+}
+
+.theme-border {
+    border-color: var(--color-input-border);
+}
+
+/* ================================================
+   AGGRESSIVE LIGHT THEME OVERRIDES
+   Catch-all rules for components with inline styles
+   ================================================ */
+
+/* Any div/section with dark background colors - apply light background */
+[data-theme="light"] div[style],
+[data-theme="light"] section[style],
+[data-theme="light"] article[style],
+[data-theme="light"] aside[style],
+[data-theme="light"] header[style],
+[data-theme="light"] footer[style] {
+    --override-bg: #FFFFFF;
+    --override-border: #E4E4E7;
+}
+
+/* Keep gradient buttons working */
+[data-theme="light"] button[style*="linear-gradient(135deg, #10B981"],
+[data-theme="light"] button[style*="linear-gradient(135deg, #10b981"] {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    color: white !important;
+}
+
+/* Override prose text for light mode */
+[data-theme="light"] .prose {
+    color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .prose-invert {
+    --tw-prose-body: var(--color-text-primary);
+    --tw-prose-headings: var(--color-text-primary);
+    --tw-prose-bold: var(--color-text-primary);
+}
+
+/* Chat page specific light theme fixes */
+[data-theme="light"] .bg-surface,
+[data-theme="light"] .bg-surface\/50,
+[data-theme="light"] .bg-surface\/80 {
+    background-color: #F4F4F5 !important;
+}
+
+[data-theme="light"] .bg-elevated,
+[data-theme="light"] .bg-elevated\/50 {
+    background-color: #FFFFFF !important;
+}
+
+/* Chat sidebar and messages */
+[data-theme="light"] .border-white\/\[0\.06\],
+[data-theme="light"] .border-white\/10 {
+    border-color: #E4E4E7 !important;
+}
+
+/* Fix placeholder text in light mode */
+[data-theme="light"] ::placeholder {
+    color: #A1A1AA !important;
+}
+
+[data-theme="light"] .placeholder\:text-zinc-600::placeholder {
+    color: #A1A1AA !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    /* Prevent ALL zoom gestures */
+    touch-action: pan-x pan-y;
+    -ms-touch-action: pan-x pan-y;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+#root {
+    min-height: 100%;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    touch-action: pan-x pan-y;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Use dvh for proper mobile viewport handling */
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* Prevent text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Prevent overscroll bounce on iOS */
+    overscroll-behavior-x: none;
+    /* Prevent pinch zoom */
+    touch-action: pan-x pan-y;
+    -ms-touch-action: pan-x pan-y;
+}
+
+/* Prevent iOS zoom on input focus - inputs must be at least 16px */
+input,
+select,
+textarea {
+    font-size: 16px !important;
+    /* Prevent zoom on focus */
+    touch-action: manipulation;
+}
+
+/* Prevent zoom on all interactive elements */
+button,
+a,
+[role="button"] {
+    touch-action: manipulation;
+}
+
+/* =========================================
+   SCROLLBAR
+   ========================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+/* =========================================
+   GLASS MORPHISM
+   ========================================= */
+
+/* Form Elements - Theme Adaptive */
+select,
+input,
+textarea {
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    border-color: var(--color-input-border);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] select,
+[data-theme="dark"] input,
+[data-theme="dark"] textarea {
+    color-scheme: dark;
+}
+
+[data-theme="light"] select,
+[data-theme="light"] input,
+[data-theme="light"] textarea {
+    color-scheme: light;
+}
+
+select option {
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+}
+
+select:focus option:checked {
+    background: linear-gradient(var(--color-primary), var(--color-primary));
+    color: white;
+}
+
+/* =========================================
+   GRADIENT TEXT/ICON OVERRIDES
+   Force white color on green gradient backgrounds
+   ========================================= */
+.gradient-primary-bg,
+.gradient-primary-bg *,
+.gradient-primary-bg svg,
+[style*="linear-gradient(135deg, #10B981"] *,
+[style*="linear-gradient(135deg, rgb(16, 185, 129)"] * {
+    color: #FFFFFF !important;
+}
+
+[data-theme="light"] .gradient-primary-bg,
+[data-theme="light"] .gradient-primary-bg *,
+[data-theme="light"] .gradient-primary-bg svg {
+    color: #FFFFFF !important;
+}
+
+.glass {
+    background: rgba(12, 12, 15, 0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-light {
+    background: rgba(26, 26, 31, 0.6);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+    background: rgba(12, 12, 15, 0.95);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   GRADIENTS & EFFECTS
+   ========================================= */
+
+.gradient-text {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-border {
+    position: relative;
+    background: var(--color-bg-elevated);
+    border-radius: 16px;
+}
+
+.gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.5), rgba(59, 130, 246, 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+.glow {
+    box-shadow: var(--shadow-glow);
+}
+
+.glow-sm {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.1);
+}
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.btn-primary {
+    @apply relative overflow-hidden px-6 py-3.5 text-white font-semibold rounded-xl transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.btn-primary:hover::before {
+    transform: translateX(100%);
+}
+
+.btn-secondary {
+    @apply px-6 py-3.5 bg-white/[0.04] border border-white/[0.08] text-white font-medium rounded-xl transition-all duration-300;
+}
+
+.btn-secondary:hover {
+    @apply bg-white/[0.08] border-white/[0.15];
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ghost {
+    @apply px-4 py-2 text-zinc-400 font-medium rounded-lg transition-all duration-200 hover:text-white hover:bg-white/[0.06];
+}
+
+/* =========================================
+   INPUTS
+   ========================================= */
+
+.input-field {
+    @apply w-full px-4 py-3.5 rounded-xl text-white transition-all duration-300 focus:outline-none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #FAFAFA;
+}
+
+.input-field::placeholder {
+    color: #52525B;
+}
+
+.input-field:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.input-field:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), 0 0 20px rgba(16, 185, 129, 0.05);
+}
+
+.input-label {
+    @apply block text-sm font-medium mb-2;
+    color: #A1A1AA;
+}
+
+/* =========================================
+   CARDS
+   ========================================= */
+
+.card {
+    @apply p-6 rounded-2xl backdrop-blur-xl;
+    background: linear-gradient(145deg, rgba(26, 26, 31, 0.8) 0%, rgba(20, 20, 24, 0.5) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1;
+}
+
+.card-hover:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(16, 185, 129, 0.03);
+}
+
+.card-accent {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
+}
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes typing {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-5px);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-fadeInDown {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.4s ease-out;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+    animation: slideUp 0.3s ease-out;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Staggered animations */
+.animate-delay-100 {
+    animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+    animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+    animation-delay: 300ms;
+}
+
+.animate-delay-400 {
+    animation-delay: 400ms;
+}
+
+.animate-delay-500 {
+    animation-delay: 500ms;
+}
+
+/* =========================================
+   CHAT SPECIFIC - Professional UI
+   ========================================= */
+
+.chat-bubble-user {
+    @apply px-4 py-3 rounded-2xl rounded-br-md shadow-lg;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.chat-bubble-ai {
+    @apply px-4 py-3 rounded-2xl rounded-tl-md shadow-sm;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+}
+
+/* Chat message appear animation */
+.chat-message-appear {
+    animation: messageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing indicator dots with stagger */
+.typing-dot {
+    @apply w-2 h-2 rounded-full;
+    background: #10B981;
+    animation: typingBounce 0.6s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 150ms;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 300ms;
+}
+
+@keyframes typingBounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-6px);
+    }
+}
+
+/* Bounce animation for typing indicator dots */
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+
+    40% {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
+}
+
+/* Chat input focus glow */
+.chat-input-container {
+    transition: all 0.2s ease-out;
+}
+
+.chat-input-container:focus-within {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    border-color: #10B981 !important;
+}
+
+/* Avatar glow effect */
+.avatar-glow {
+    position: relative;
+}
+
+.avatar-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #10B981, #059669);
+    opacity: 0.3;
+    filter: blur(8px);
+    z-index: -1;
+}
+
+/* Streaming cursor */
+.streaming-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: #10B981;
+    margin-left: 2px;
+    animation: cursorBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes cursorBlink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Message hover actions */
+.message-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message-container:hover .message-actions {
+    opacity: 1;
+}
+
+/* Welcome card hover */
+.welcome-card {
+    transition: all 0.2s ease-out;
+}
+
+.welcome-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -8px rgba(16, 185, 129, 0.2);
+}
+
+/* Source pill animation */
+.source-pill {
+    transition: all 0.2s ease;
+}
+
+.source-pill:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+/* =========================================
+   BACKGROUND PATTERNS
+   ========================================= */
+
+.bg-grid {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.bg-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.bg-gradient-radial {
+    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+}
+
+/* =========================================
+   UTILITIES
+   ========================================= */
+
+.text-balance {
+    text-wrap: balance;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Selection */
+::selection {
+    background: rgba(16, 185, 129, 0.3);
+    color: white;
+}
+
+/* Focus visible */
+:focus-visible {
+    outline: 2px solid rgba(16, 185, 129, 0.5);
+    outline-offset: 2px;
+}
+
+.animate-slideUp {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-pulse-slow {
+    animation: pulse 2s infinite;
+}
+
+/* Glass effect */
+.glass {
+    background: rgba(17, 17, 19, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Smooth scroll container */
+.scroll-smooth {
+    scroll-behavior: smooth;
+}
+
+/* Interactive hover states */
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.3);
+}
+
+/* Button press effect */
+.press-effect:active {
+    transform: scale(0.97);
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.skeleton {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--color-bg-secondary) 25%, var(--color-bg-elevated) 50%, var(--color-bg-secondary) 75%);
+    background-size: 200% 100%;
+}
+
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Card hover glow effect */
+.card-glow {
+    transition: box-shadow 0.3s ease;
+}
+
+.card-glow:hover {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+}
+
+/* =========================================
+   ENHANCED ANIMATIONS & MICRO-INTERACTIONS
+   ========================================= */
+
+/* Page transition */
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-enter {
+    animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Bounce effect */
+@keyframes bounce-subtle {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.hover-bounce:hover {
+    animation: bounce-subtle 0.4s ease-in-out;
+}
+
+/* Ripple effect for buttons */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.4s, opacity 0.8s;
+}
+
+.ripple:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+}
+
+/* Glow pulse for important elements */
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
+    }
+}
+
+.glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Gradient border animation */
+@keyframes gradient-rotate {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-border {
+    position: relative;
+    background: var(--color-bg-card);
+    border-radius: 1rem;
+}
+
+.gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: calc(1rem + 2px);
+    background: linear-gradient(90deg, #10B981, #059669, #10B981);
+    background-size: 200% 100%;
+    animation: gradient-rotate 3s linear infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+    opacity: 1;
+}
+
+/* Icon spin on hover */
+.icon-spin-hover:hover svg {
+    animation: spin 0.5s ease-in-out;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Scale up subtle */
+.scale-hover {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scale-hover:hover {
+    transform: scale(1.02);
+}
+
+.scale-hover:active {
+    transform: scale(0.98);
+}
+
+/* Nav link indicator animation */
+@keyframes nav-indicator {
+    from {
+        transform: scaleX(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+}
+
+.nav-active-indicator {
+    animation: nav-indicator 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Number count up animation */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.count-up {
+    animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Stagger children animation */
+.stagger-children>* {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.stagger-children>*:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.stagger-children>*:nth-child(2) {
+    animation-delay: 50ms;
+}
+
+.stagger-children>*:nth-child(3) {
+    animation-delay: 100ms;
+}
+
+.stagger-children>*:nth-child(4) {
+    animation-delay: 150ms;
+}
+
+.stagger-children>*:nth-child(5) {
+    animation-delay: 200ms;
+}
+
+.stagger-children>*:nth-child(6) {
+    animation-delay: 250ms;
+}
+
+/* Card 3D tilt effect on hover */
+.card-3d {
+    transition: transform 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
+}
+
+/* Blur in animation */
+@keyframes blurIn {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.blur-in {
+    animation: blurIn 0.5s ease-out;
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+    0% {
+        stroke-dashoffset: 100;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+.checkmark-animate {
+    stroke-dasharray: 100;
+    animation: checkmark 0.5s ease-in-out forwards;
+}
+
+/* Tooltip fade */
+.tooltip-fade {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.tooltip-trigger:hover .tooltip-fade {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Smooth number transitions */
+.number-transition {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}

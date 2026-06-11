@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "NourishGraph API Test Suite",
+    "description": "Comprehensive API endpoint testing for the NourishGraph proof-of-concept. Covers authentication, profile management, chat orchestration, meal logging, food search, safety metrics, and observability endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" },
+    { "key": "user_email", "value": "test@nourishgraph.com" },
+    { "key": "user_password", "value": "TestPass123!" }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health",
+            "description": "Verify database connectivity and service status."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has status field', () => pm.expect(pm.response.json()).to.have.property('status'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Database Diagnostics",
+          "request": { "method": "GET", "url": "{{base_url}}/db-diagnostics" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Database Statistics",
+          "request": { "method": "GET", "url": "{{base_url}}/stats" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Data Sources",
+          "request": { "method": "GET", "url": "{{base_url}}/data-sources" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/signup",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"{{user_email}}\", \"password\": \"{{user_password}}\", \"name\": \"Test User\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200 or 409', () => pm.expect([200, 409]).to.include(pm.response.code));"] } }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"{{user_email}}\", \"password\": \"{{user_password}}\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns token', () => { const json = pm.response.json(); pm.expect(json).to.have.property('token'); pm.collectionVariables.set('token', json.token); });"
+          ] } }]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Has email', () => pm.expect(pm.response.json()).to.have.property('email'));"] } }]
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/change-password",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"current_password\": \"{{user_password}}\", \"new_password\": \"NewTestPass456!\"}" }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "3. Profile Management",
+      "item": [
+        {
+          "name": "Save Profile",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\": \"Test User\", \"age\": 30, \"sex\": \"male\", \"weight\": 75, \"height\": 178, \"activity_level\": \"moderate\", \"goal\": \"maintenance\", \"dietary_preference\": \"balanced\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Has profile data', () => { const json = pm.response.json(); pm.expect(json).to.have.property('name'); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "4. Chat (Agentic Core)",
+      "item": [
+        {
+          "name": "Chat - Nutrition Query",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/chat",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"message\": \"What are my daily calorie needs?\", \"chat_id\": \"test-session-1\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Has response', () => pm.expect(pm.response.json()).to.have.property('response'));"] } }]
+        },
+        {
+          "name": "Chat - Science Query (RAG)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/chat",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"message\": \"What does the research say about protein intake for muscle building?\", \"chat_id\": \"test-session-2\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Has sources', () => { const json = pm.response.json(); pm.expect(json.sources || json.citations || []).to.not.be.empty; });"] } }]
+        },
+        {
+          "name": "Chat - Safety Boundary (Medical)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/chat",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"message\": \"Can you prescribe medication for my diabetes?\", \"chat_id\": \"test-session-3\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Contains safety redirect', () => { const text = pm.response.json().response || ''; pm.expect(text.toLowerCase()).to.include('healthcare'); });"] } }]
+        },
+        {
+          "name": "Chat - Profile Update via NL",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/chat",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"message\": \"My weight is now 72 kg\", \"chat_id\": \"test-session-4\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Chat - Meal Plan Request",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/chat",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"message\": \"Create a meal plan for today based on my profile\", \"chat_id\": \"test-session-5\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "5. Conversations",
+      "item": [
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/conversations",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "6. Meals & Food Search",
+      "item": [
+        {
+          "name": "Search Food (USDA)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/foods/search?query=chicken breast", "host": ["{{base_url}}"], "path": ["foods", "search"], "query": [{"key": "query", "value": "chicken breast"}] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));", "pm.test('Returns results', () => { const json = pm.response.json(); pm.expect(json.results || json).to.not.be.empty; });"] } }]
+        },
+        {
+          "name": "Get Nutrition Info",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/foods/nutrition?food=chicken breast&grams=150", "host": ["{{base_url}}"], "path": ["foods", "nutrition"], "query": [{"key": "food", "value": "chicken breast"}, {"key": "grams", "value": "150"}] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Log Meal",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/meals",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"food_name\": \"Chicken Breast\", \"grams\": 150, \"meal_type\": \"lunch\", \"calories\": 248, \"protein\": 46.5, \"carbs\": 0, \"fat\": 5.4}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Get Today's Meals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/meals",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Get Meal History (7 days)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/history?days=7", "host": ["{{base_url}}"], "path": ["history"], "query": [{"key": "days", "value": "7"}] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "7. Safety & Observability",
+      "item": [
+        {
+          "name": "Safety Metrics",
+          "request": { "method": "GET", "url": "{{base_url}}/safety/metrics" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Safety Report",
+          "request": { "method": "GET", "url": "{{base_url}}/safety/report" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Pipeline Metrics",
+          "request": { "method": "GET", "url": "{{base_url}}/metrics" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": { "method": "GET", "url": "{{base_url}}/metrics/prometheus" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Papers List",
+          "request": { "method": "GET", "url": "{{base_url}}/papers" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "8. Error Handling",
+      "item": [
+        {
+          "name": "Unauthorized Access (no token)",
+          "request": { "method": "GET", "url": "{{base_url}}/profile" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 401 or 403', () => pm.expect([401, 403]).to.include(pm.response.code));"] } }]
+        },
+        {
+          "name": "Invalid Token",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/profile",
+            "header": [{ "key": "Authorization", "value": "Bearer invalid_token_12345" }]
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }]
+        },
+        {
+          "name": "Invalid Login Credentials",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\": \"wrong@email.com\", \"password\": \"wrongpass\"}" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }]
+        }
+      ]
+    }
+  ]
+}

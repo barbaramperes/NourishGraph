@@ -1,0 +1,37 @@
+# NourishGraph - Testing Requirements
+# Install with: pip install -r requirements-test.txt
+
+# Core Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+pytest-html>=4.1.1
+pytest-xdist>=3.5.0
+pytest-json-report>=1.5.0
+
+# LLM Evaluation (optional - install separately if needed)
+# deepeval>=1.1.0
+# ragas>=0.1.7
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# HTTP Testing
+httpx>=0.26.0
+requests>=2.31.0
+
+# Async Support
+aiohttp>=3.9.0
+
+# JSON Schema Validation
+jsonschema>=4.21.0
+
+# Mocking
+responses>=0.24.0
+pytest-mock>=3.12.0

@@ -1,0 +1,70 @@
+# === Environment ===
+.env
+.env.local
+/.venv/
+*.local
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# === Node ===
+node_modules/
+dist/
+
+# === IDE ===
+.idea/
+.vscode/
+*.swp
+
+# === OS ===
+.DS_Store
+Thumbs.db
+~$*
+
+# === Logs ===
+*.log
+npm-debug.log*
+
+# === Thesis & personal docs (not for repo) ===
+docs/*.docx
+docs/*.pdf
+docs/*.txt
+docs/*.py
+docs/_backups/
+_thesis_archive/
+
+# === Evaluation data (local only) ===
+evaluation/
+
+# === Thesis charts (local only) ===
+thesis_charts/*.png
+thesis_charts/*.pdf
+thesis_charts/*.svg
+
+# === Heavy binaries ===
+*.jar
+
+# === Papers corpus (copyright — not redistributed; see papers/README.md) ===
+papers/*
+!papers/README.md
+app/data/paper_chunks.pkl
+
+# === Generated diagram assets ===
+docs/diagrams/*.png
+docs/diagrams/*.puml
+docs/diagrams/*.tex
+docs/diagrams/*.md
+
+# === Personal / thesis material (never in public repo) ===
+.claude/
+thesis_charts/
+docs/diagrams_new/
+docs/DIA1_DIA2_CHANGES.md
+docs/chapter5_ablation_text.md
+docs/thesis_patterns_checklist.md
+

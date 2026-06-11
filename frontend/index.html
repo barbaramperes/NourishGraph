@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- Primary Meta Tags -->
+    <title>NourishGraph</title>
+    <meta name="title" content="NourishGraph" />
+    <meta name="description"
+        content="NourishGraph is an AI-powered proactive nutrition assistant with multi-agent architecture. Get personalized meal plans, track your nutrition, and achieve your health goals with science-backed recommendations." />
+    <meta name="keywords"
+        content="nutrition, AI, meal planning, diet, health, fitness, calories, macros, personalized nutrition" />
+    <meta name="author" content="NourishGraph" />
+    <meta name="theme-color" content="#10B981" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nourishgraph.com/" />
+    <meta property="og:title" content="NourishGraph" />
+    <meta property="og:description"
+        content="Get personalized meal plans, track your nutrition, and achieve your health goals with science-backed AI recommendations." />
+    <meta property="og:image" content="/favicon.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://nourishgraph.com/" />
+    <meta property="twitter:title" content="NourishGraph" />
+    <meta property="twitter:description"
+        content="Get personalized meal plans, track your nutrition, and achieve your health goals with science-backed AI recommendations." />
+    <meta property="twitter:image" content="/favicon.svg" />
+
+    <!-- Google Fonts: NourishGraph Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function () {
+            try {
+                const stored = localStorage.getItem('nourishgraph-theme');
+                if (stored && stored !== 'system') {
+                    document.documentElement.classList.add(stored);
+                    document.documentElement.setAttribute('data-theme', stored);
+                } else {
+                    // Check system preference
+                    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const theme = isDark ? 'dark' : 'light';
+                    document.documentElement.classList.add(theme);
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            } catch (e) { }
+        })();
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
