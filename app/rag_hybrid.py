@@ -429,6 +429,16 @@ def dense_search(query: str, top_k: int = TOP_K_SEARCH) -> List[Dict]:
 # SPARSE SEARCH (Lexical - Pinecone sparse embeddings)
 # ============================================================
 
+def _hit_value(hit, *keys):
+    """First of *keys* readable from a search hit, whatever the SDK's hit type."""
+    for key in keys:
+        try:
+            return hit[key]
+        except (KeyError, TypeError):
+            continue
+    return None
+
+
 def sparse_search(query: str, top_k: int = TOP_K_SEARCH) -> List[Dict]:
     """
     Lexical search using sparse embeddings.
@@ -452,16 +462,18 @@ def sparse_search(query: str, top_k: int = TOP_K_SEARCH) -> List[Dict]:
         
         results = []
         for hit in res.get("result", {}).get("hits", []):
-            chunk_id = hit["_id"]
-            fields = hit.get("fields", {})
-            
+            # Older SDKs return hits as dicts keyed "_id"/"_score"; newer ones as
+            # models read as "id"/"score" (hit["_id"] raises KeyError there).
+            chunk_id = _hit_value(hit, "_id", "id")
+            fields = _hit_value(hit, "fields") or {}
+
             paper_id = fields.get("paper_id", "")
             if not paper_id and "_chunk_" in chunk_id:
                 paper_id = chunk_id.rsplit("_chunk_", 1)[0]
-            
+
             results.append({
                 "id": chunk_id,
-                "score": float(hit["_score"]),
+                "score": float(_hit_value(hit, "_score", "score") or 0.0),
                 "title": fields.get("title", ""),
                 "text": fields.get("chunk_text", ""),
                 "source": fields.get("source", ""),
