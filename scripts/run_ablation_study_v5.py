@@ -117,9 +117,26 @@ def strip_thousands(text: str) -> str:
     return re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)
 
 
+# "Your BMR is approximately **1483 calories per day**", "Basal Metabolic Rate (BMR) is 1483 kcal/day",
+# "| BMR | 1483 kcal/day |": a value given AS the BMR, with a calorie unit.
+_STATED_BMR = re.compile(
+    r"(?:BMR|basal metabolic rate)\b[^.\n]{0,60}?(?:\bis\b|=|≈|:|\|)\s*"
+    r"(?:approximately|about|around|roughly|~)?\s*\**\s*(\d{3,5}(?:\.\d+)?)\s*\**\s*(?:kcal|calories?|cal)\b",
+    re.IGNORECASE)
+
+
 def extract_bmr(response: str):
-    """The BMR value the response states, or None."""
+    """The BMR value the response states as its result, or None.
+
+    Takes the last value given as the BMR with a calorie unit, so that the terms of a worked
+    calculation ("BMR = 10 x 70 = 700 + ...") are not read as the result; the November 2026
+    unconstrained-baseline run showed that reading the first number after "BMR" returns 10 x weight.
+    Falls back to the first number after "BMR", then to the first calorie value.
+    """
     text = strip_thousands(response)
+    stated = _STATED_BMR.findall(text)
+    if stated:
+        return float(stated[-1])
     m = re.search(r"(?:BMR|basal metabolic rate)[^0-9]{0,40}(\d{3,5}(?:\.\d+)?)", text, re.IGNORECASE)
     if m:
         return float(m.group(1))
