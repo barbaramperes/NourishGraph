@@ -94,8 +94,8 @@ def main(path: str):
         if n:
             print(f"  {cfg:<20} extracted {n:>3} | author+year in retrieved papers {in_ret:>3} | "
                   f"in corpus {in_corpus:>3} | flagged by validator {flagged:>3}")
-    print("  The validator compares only the first author's surname, so a citation of a co-author,")
-    print("  or of a first author stored as 'Surname Initials', is flagged although it is traceable.")
+    print("  'flagged' uses the current validator; scripts/citation_validator_check.py compares it")
+    print("  with the version run in v4 and v5, which flagged traceable co-author citations.")
 
 
 if __name__ == "__main__":

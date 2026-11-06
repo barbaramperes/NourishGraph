@@ -203,36 +203,78 @@ class CitationValidator:
         )
 
 
-def extract_citations_from_text(response_text: str) -> List[Dict[str, str]]:
+_PARTICLE = r"(?:(?:de|da|del|der|di|du|la|le|van|von)\s+)?"
+# A name starts a word: without the lookbehind, "Ravinder Nagpal" would yield "der Nagpal".
+_NAME = r"(?<![\w'’\-])" + _PARTICLE + r"[A-ZÀ-ÖØ-Þ][\w'’\-]+"
+_ONE = re.compile(
+    rf"^(?:e\.g\.,?\s*|see\s+|cf\.\s*)?({_NAME})"
+    rf"(?:\s+et\s+al\.?|\s+(?:and|&)\s+({_NAME}))?,?\s+(\d{{4}})[a-z]?$"
+)
+_PARENS = re.compile(r"\(([^()]*\d{4}[a-z]?)\)")
+_NARRATIVE = re.compile(
+    rf"({_NAME})(?:\s+et\s+al\.?|\s+(?:and|&)\s+({_NAME}))?\s*\((\d{{4}})[a-z]?\)"
+)
+_BRACKET = re.compile(rf"\[({_NAME})(?:\s+et\s+al\.?)?,?\s*(\d{{4}})[a-z]?\]")
+_NUMERIC = re.compile(r"\[(\d{1,3}(?:\s*[,–-]\s*\d{1,3})*)\]")
+
+
+def _citation(first: str, second: Optional[str], year: str, style: str) -> Dict[str, Any]:
+    return {
+        "authors": f"{first} et al." if style == "et_al" else first,
+        "first_author": first,
+        "second_author": second,
+        "year": int(year),
+        "style": style,
+    }
+
+
+def extract_citations_from_text(response_text: str) -> List[Dict[str, Any]]:
     """
-    Extract citation-like patterns from free-form text.
-    
-    Looks for patterns like:
-    - (Author et al., 2021)
-    - Author et al. (2021)
+    Extract in-text citations from free-form text.
+
+    Recognised forms:
+    - (Author et al., 2021), (Author, 2021), (Author and Other, 2021), several separated by ";"
+    - Author et al. (2021), Author and Other (2021)
     - [Author, 2021]
-    
-    Returns list of potential citations for validation.
+    - numeric [1] or [1, 2] (returned with style "numeric": they cannot be traced to a paper)
+
+    Surnames may carry hyphens, apostrophes, accents and particles (Delgado-Lista, O'Keefe, de Vos).
     """
-    patterns = [
-        # (Author et al., 2021)
-        r'\(([A-Z][a-z]+(?:\s+et\s+al\.)?),?\s*(\d{4})\)',
-        # Author et al. (2021)
-        r'([A-Z][a-z]+(?:\s+et\s+al\.)?)\s*\((\d{4})\)',
-        # [Author, 2021]
-        r'\[([A-Z][a-z]+(?:\s+et\s+al\.)?),?\s*(\d{4})\]',
-    ]
-    
-    citations = []
-    for pattern in patterns:
-        matches = re.findall(pattern, response_text)
-        for match in matches:
-            citations.append({
-                'authors': match[0],
-                'year': int(match[1]) if match[1].isdigit() else None
-            })
-    
+    citations: List[Dict[str, Any]] = []
+    for group in _PARENS.findall(response_text):
+        for piece in group.split(";"):
+            m = _ONE.match(piece.strip())
+            if m:
+                style = "et_al" if "et al" in piece else ("two" if m.group(2) else "single")
+                citations.append(_citation(m.group(1), m.group(2), m.group(3), style))
+    for m in _NARRATIVE.finditer(response_text):
+        style = "et_al" if "et al" in m.group(0) else ("two" if m.group(2) else "single")
+        citations.append(_citation(m.group(1), m.group(2), m.group(3), style))
+    for m in _BRACKET.finditer(response_text):
+        citations.append(_citation(m.group(1), None, m.group(2), "bracket"))
+    for m in _NUMERIC.finditer(response_text):
+        citations.append({"authors": f"[{m.group(1)}]", "first_author": None, "second_author": None,
+                          "year": None, "style": "numeric"})
     return citations
+
+
+def _fold(text: str) -> str:
+    """Lowercase and strip accents, so 'Pérez' matches 'Perez'."""
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFKD", str(text)) if not unicodedata.combining(c)).lower()
+
+
+def _paper_authors(paper: Dict[str, Any]) -> List[str]:
+    metadata = paper.get("metadata", {}) or {}
+    authors = metadata.get("authors") or paper.get("authors") or []
+    if isinstance(authors, str):
+        authors = [a.strip() for a in authors.split(",")]
+    return [_fold(a) for a in authors if a]
+
+
+def _names_author(surname: str, author: str) -> bool:
+    """True when the cited surname is a whole word of the author's name, in any name order."""
+    return re.search(rf"(?<![\w\-]){re.escape(_fold(surname))}(?![\w\-])", author) is not None
 
 
 def validate_inline_citations(
@@ -240,52 +282,44 @@ def validate_inline_citations(
     search_results: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
     """
-    Validate inline citations in response text against search results.
-    
+    Check each in-text citation against the papers retrieved for this response.
+
+    A citation is validated when a retrieved paper from the cited year lists the cited
+    surname among ANY of its authors (and, for "A and B", both surnames). Names stored as
+    "Surname Initials" or "Given Surname" both match. Numeric citations cannot be traced and
+    are reported as unvalidated. The result is logged; the response text is not changed.
+
     Returns:
         Dict with validation results
     """
     extracted = extract_citations_from_text(response_text)
-    
-    # Get authors/years from search results for comparison
-    valid_authors = set()
+    papers = []
     for paper in search_results:
-        metadata = paper.get('metadata', {})
-        authors = metadata.get('authors', '') or paper.get('authors', '')
-        year = metadata.get('year') or paper.get('year')
-        
-        if authors:
-            # Handle both string and list formats
-            if isinstance(authors, list):
-                authors = ', '.join(str(a) for a in authors)
-            # Extract first author surname
-            first_author = authors.split(',')[0].split()[-1] if authors else ''
-            if first_author:
-                valid_authors.add((first_author.lower(), year))
-    
-    validated = []
-    unvalidated = []
-    
+        metadata = paper.get("metadata", {}) or {}
+        year = metadata.get("year") or paper.get("year")
+        papers.append((_paper_authors(paper), str(year)[:4] if year else None))
+
+    validated, unvalidated = [], []
     for citation in extracted:
-        author = citation['authors'].replace(' et al.', '').lower()
-        year = citation['year']
-        
-        # Check if this author/year combo exists in results
-        matched = any(
-            author in va[0].lower() for va in valid_authors
-        )
-        
-        if matched:
+        if citation["style"] == "numeric":
+            unvalidated.append({**citation, "reason": "numeric citation cannot be traced to a paper"})
+            continue
+        names = [n for n in (citation["first_author"], citation["second_author"]) if n]
+        by_name = [(authors, year) for authors, year in papers
+                   if all(any(_names_author(n, a) for a in authors) for n in names)]
+        if any(year is None or year == str(citation["year"]) for _, year in by_name):
             validated.append(citation)
+        elif by_name:
+            unvalidated.append({**citation, "reason": "author retrieved, but not with the cited year"})
         else:
-            unvalidated.append(citation)
-    
+            unvalidated.append({**citation, "reason": "author not among the retrieved papers"})
+
     return {
-        'total_citations': len(extracted),
-        'validated': len(validated),
-        'unvalidated': len(unvalidated),
-        'unvalidated_list': unvalidated,
-        'validation_rate': len(validated) / len(extracted) if extracted else 1.0
+        "total_citations": len(extracted),
+        "validated": len(validated),
+        "unvalidated": len(unvalidated),
+        "unvalidated_list": unvalidated,
+        "validation_rate": len(validated) / len(extracted) if extracted else 1.0
     }
 
 
