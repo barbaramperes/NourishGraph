@@ -132,18 +132,15 @@ export const useAuthStore = create(
                 }
             },
 
-            // Google login - now uses backend API
-            loginWithGoogle: async (userData) => {
+            // Google login: `credential` is the Google ID token (JWT) from Google
+            // Identity Services. The backend verifies it and derives the user's
+            // identity from its claims - never send email/name from the client.
+            loginWithGoogle: async (credential) => {
                 set({ isLoading: true, error: null })
                 try {
-                    // Call backend to authenticate Google user
                     const result = await authFetch('/auth/google', {
                         method: 'POST',
-                        body: JSON.stringify({
-                            email: userData.email,
-                            name: userData.name,
-                            picture: userData.picture
-                        })
+                        body: JSON.stringify({ credential })
                     })
 
                     if (result.success && result.token) {

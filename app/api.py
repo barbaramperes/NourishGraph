@@ -30,7 +30,18 @@ try:
 except Exception:  # pragma: no cover
     jwt = None
 
+try:
+    # Server-side verification of Google ID tokens (Sign in with Google)
+    from google.oauth2 import id_token as google_id_token
+    from google.auth.transport import requests as google_auth_requests
+    from google.auth import exceptions as google_auth_exceptions
+except Exception:  # pragma: no cover
+    google_id_token = None
+    google_auth_requests = None
+    google_auth_exceptions = None
+
 from fastapi import FastAPI, HTTPException, Query, Depends, Header, Request, BackgroundTasks
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -220,6 +231,7 @@ rate_limiter = RateLimiter()
 # Rate limit configurations
 RATE_LIMITS = {
     "login": {"max_requests": 5, "window_seconds": 300},      # 5 attempts per 5 minutes
+    "google_auth": {"max_requests": 5, "window_seconds": 300},  # 5 attempts per 5 minutes
     "signup": {"max_requests": 3, "window_seconds": 3600},    # 3 signups per hour per IP
     "forgot_password": {"max_requests": 3, "window_seconds": 3600},  # 3 requests per hour
     "chat": {"max_requests": 30, "window_seconds": 60},       # 30 messages per minute
@@ -269,6 +281,8 @@ async def lifespan(app: FastAPI):
     auth_secret_loaded = bool(_get_auth_secret_key())
     jwt_enabled = bool(jwt) and auth_secret_loaded
     print(f"  Auth:       {'OK (JWT)' if jwt_enabled else 'WARN (legacy tokens)'}")
+    google_ready = bool(_get_google_client_id()) and google_id_token is not None
+    print(f"  Google:     {'OK' if google_ready else 'DISABLED (set GOOGLE_CLIENT_ID, install google-auth)'}")
     
     if HAS_DATABASE:
         # Warm up DB connection in a background thread — don't block startup
@@ -1675,40 +1689,114 @@ async def change_password(data: ChangePasswordIn, user_id: int = Depends(require
 
 
 class GoogleAuthIn(BaseModel):
-    email: str
-    name: Optional[str] = None
-    picture: Optional[str] = None
+    """Body for POST /auth/google.
+
+    ``credential`` is the Google ID token (a signed JWT) returned to the browser
+    by Google Identity Services. It is optional at the schema level only so that
+    a missing token produces a 401 instead of a 422; it is always required.
+    Any other fields (e.g. a client-supplied ``email`` or ``name``) are ignored:
+    identity is taken exclusively from the verified token claims.
+    """
+    credential: Optional[str] = None
+
+
+GOOGLE_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
+
+
+def _get_google_client_id() -> str:
+    """OAuth client ID that Google ID tokens must be issued for (the ``aud`` claim)."""
+    return (os.getenv("GOOGLE_CLIENT_ID") or "").strip()
+
+
+def _google_transport_request():
+    """HTTP transport google-auth uses to fetch Google's public signing certs."""
+    return google_auth_requests.Request()
+
+
+def verify_google_id_token(token: str) -> Dict[str, Any]:
+    """Verify a Google ID token and return its claims.
+
+    Checks the signature against Google's published keys, expiry, that ``aud``
+    is our configured client ID, that ``iss`` is Google, and that the email is
+    verified. Raises ``ValueError`` (or a google-auth exception) on any failure.
+    Performs blocking network I/O; call it from a worker thread.
+    """
+    client_id = _get_google_client_id()
+    if not client_id or google_id_token is None:
+        raise RuntimeError("Google sign-in is not configured")
+
+    claims = google_id_token.verify_oauth2_token(
+        token,
+        _google_transport_request(),
+        client_id,
+        clock_skew_in_seconds=10,  # tolerate small clock drift on iat/exp
+    )
+
+    # verify_oauth2_token already enforces aud/iss/exp; re-check explicitly so
+    # these guarantees don't depend on library defaults.
+    if claims.get("aud") != client_id:
+        raise ValueError("Token audience does not match this application")
+    if claims.get("iss") not in GOOGLE_ISSUERS:
+        raise ValueError("Token was not issued by Google")
+    if claims.get("email_verified") not in (True, "true"):
+        raise ValueError("Google account email is not verified")
+    if not claims.get("email") or "@" not in claims["email"]:
+        raise ValueError("Token has no email claim")
+    return claims
 
 
 @app.post("/auth/google", response_model=AuthResponse, tags=["Auth"])
-async def google_auth(data: GoogleAuthIn):
+async def google_auth(data: GoogleAuthIn, request: Request):
     """
-    Authenticate with Google OAuth.
-    
-    Creates user if doesn't exist, or logs in if exists.
-    Always updates name from Google to ensure it's current.
+    Authenticate with a Google ID token (Sign in with Google).
+
+    The token is verified server-side; email and name come only from its
+    verified claims. Creates the user if they don't exist, otherwise logs in.
     Returns a JWT token for subsequent requests.
+
+    Rate limited: 5 attempts per 5 minutes per IP.
+    Returns 401 if the credential is missing or fails verification.
     """
+    check_rate_limit(request, "google_auth")
+
+    token = (data.credential or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing Google credential")
+
+    if not _get_google_client_id() or google_id_token is None:
+        print("[ERROR] /auth/google called but GOOGLE_CLIENT_ID or google-auth is missing")
+        raise HTTPException(status_code=503, detail="Google sign-in is not available")
+
+    try:
+        claims = await run_in_threadpool(verify_google_id_token, token)
+    except google_auth_exceptions.TransportError:
+        # Could not reach Google to fetch signing certs - not the client's fault.
+        traceback.print_exc()
+        raise HTTPException(status_code=503, detail="Google sign-in is temporarily unavailable")
+    except Exception as e:
+        print(f"[WARN] Rejected Google credential: {type(e).__name__}: {str(e)[:200]!r}")
+        raise HTTPException(status_code=401, detail="Invalid Google credential")
+
+    email = normalize_email(claims["email"])
+    name = (claims.get("name") or "").strip() or None
+
     try:
         db = check_db()
         
-        if not data.email or '@' not in data.email:
-            return AuthResponse(success=False, message="Invalid email from Google")
-        
         # Check if user exists
-        user = db.get_user_by_email(data.email)
+        user = db.get_user_by_email(email)
         
         if user:
             # Existing user - login and update name from Google if different
-            if data.name and user.get("name") != data.name:
-                db.update_user_profile(user["id"], name=data.name)
-                user["name"] = data.name
+            if name and user.get("name") != name:
+                db.update_user_profile(user["id"], name=name)
+                user["name"] = name
         else:
             # New user - create account (no password needed for Google users)
             user = db.create_user(
-                email=data.email,
+                email=email,
                 password_hash=None,  # Google users don't have password
-                name=data.name
+                name=name
             )
             if not user:
                 return AuthResponse(success=False, message="Failed to create account")
@@ -1719,11 +1807,11 @@ async def google_auth(data: GoogleAuthIn):
         # Check if user has profile
         has_profile = bool(user.get("weight") or user.get("age"))
         
-        # Always use the name from Google (data.name) as primary
+        # Prefer the (verified) name from Google
         user_data = {
             "id": user["id"],
             "email": user["email"],
-            "name": data.name or user.get("name"),
+            "name": name or user.get("name"),
             "age": user.get("age"),
             "weight": user.get("weight"),
             "height": user.get("height"),
