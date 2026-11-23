@@ -226,17 +226,58 @@ RATE_LIMITS = {
 }
 
 
+def _parse_trusted_proxy_count(raw: Optional[str], default: int = 1) -> int:
+    """Parse TRUSTED_PROXY_COUNT, falling back to `default` on bad input."""
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = int(raw.strip())
+    except ValueError:
+        print(f"[WARN] Invalid TRUSTED_PROXY_COUNT={raw!r}; using {default}")
+        return default
+    if value < 0:
+        print(f"[WARN] Negative TRUSTED_PROXY_COUNT={raw!r}; using {default}")
+        return default
+    return value
+
+
+# Number of reverse proxies in front of the app that append to X-Forwarded-For.
+# Railway's edge proxy is one hop, so the default is 1. Set to 0 when the app is
+# exposed directly (local dev), so the header is ignored entirely.
+TRUSTED_PROXY_COUNT = _parse_trusted_proxy_count(os.getenv("TRUSTED_PROXY_COUNT"))
+
+
+def get_client_ip(request: Request) -> str:
+    """
+    Return the client IP to use for rate limiting.
+
+    The leftmost X-Forwarded-For entries are whatever the client sent, so they
+    can be spoofed. Each trusted proxy appends the address of the peer it saw,
+    so the real client is the entry TRUSTED_PROXY_COUNT positions from the right.
+    Falls back to the socket peer when the header is missing, shorter than
+    expected, or TRUSTED_PROXY_COUNT is 0.
+    """
+    peer = request.client.host if request.client else "unknown"
+    if TRUSTED_PROXY_COUNT <= 0:
+        return peer
+
+    # A client can send its own X-Forwarded-For line alongside the proxy's,
+    # so combine every occurrence in order before counting from the right.
+    forwarded = ",".join(request.headers.getlist("X-Forwarded-For"))
+    hops = [h.strip() for h in forwarded.split(",") if h.strip()]
+    if len(hops) < TRUSTED_PROXY_COUNT:
+        return peer
+    return hops[-TRUSTED_PROXY_COUNT]
+
+
 def check_rate_limit(request: Request, endpoint: str) -> None:
     """
     Check rate limit for an endpoint. Raises HTTPException if limited.
-    
-    Uses client IP as the rate limit key.
+
+    Uses client IP (see get_client_ip) as the rate limit key.
     """
-    # Get client IP (handle proxies)
-    client_ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
-    if not client_ip:
-        client_ip = request.client.host if request.client else "unknown"
-    
+    client_ip = get_client_ip(request)
+
     config = RATE_LIMITS.get(endpoint, {"max_requests": 60, "window_seconds": 60})
     key = f"{endpoint}:{client_ip}"
     

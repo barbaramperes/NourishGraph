@@ -332,9 +332,26 @@ COHERE_API_KEY=...         # Reranking fallback
 RESEND_API_KEY=...         # Transactional email (password reset)
 HYBRID_ALPHA=0.7           # Dense vs sparse retrieval weight
 LLM_MODEL=gpt-4o-mini
+TRUSTED_PROXY_COUNT=1      # Proxies in front of the app (see below)
 ```
 
 See [`.env.example`](.env.example) for the complete annotated list.
+
+### Client IP for rate limiting
+
+Auth endpoints are rate limited per client IP. Behind a reverse proxy, the client
+IP comes from `X-Forwarded-For`, but only the entries the proxies appended (on the
+right) can be trusted; anything to the left was sent by the client. The app takes
+the entry `TRUSTED_PROXY_COUNT` hops from the right, and falls back to the socket
+peer when the header is missing or shorter than that.
+
+- **Railway:** one edge proxy, so the default of `1` applies.
+- **Local / no proxy:** set `TRUSTED_PROXY_COUNT=0` so the header is ignored.
+- **Extra proxy or CDN in front (e.g. Cloudflare):** add one per hop that appends.
+
+We do this in the app rather than with uvicorn's `--forwarded-allow-ips`, because
+Railway publishes no stable address range for its proxies, and with
+`--forwarded-allow-ips='*'` uvicorn takes the leftmost (client-supplied) entry.
 
 ---
 
